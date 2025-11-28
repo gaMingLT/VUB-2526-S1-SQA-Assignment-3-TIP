@@ -1,0 +1,13 @@
+main() {
+  var x, y;
+  x = input;
+  y = input;
+  if (0 > x) {
+    if (0 > y) {
+      if ((x + y) > 0) {
+        error 1;
+      }
+    }
+  }
+  return 1;
+}

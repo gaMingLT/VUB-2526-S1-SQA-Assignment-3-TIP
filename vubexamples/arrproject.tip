@@ -1,0 +1,25 @@
+main () {
+  var a,i,x,y,z;
+  x = {0,0,0};
+  i = 0;
+  while (3 > i) {
+    a = input;
+    if (3 > a) {
+      if (a > -1) {
+        x[i] = a;
+      }
+    }
+    i = i + 1;
+  }
+  y = {3,7,1};
+  z = {0,8,2};
+  i = 0;
+  while (3 > i) {
+    x[i] = y[i] * z[x[i]];
+    if (x[i] > 40) {
+      error 1;
+    }
+    i = i + 1;
+  }
+  return x[2];
+}

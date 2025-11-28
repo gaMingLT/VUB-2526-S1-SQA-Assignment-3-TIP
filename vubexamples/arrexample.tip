@@ -1,0 +1,14 @@
+main() {
+  var a,b,i;
+  a = 20;
+  b = input;
+  i = 5;
+  if (a > b) {
+
+	  while (b > i) {
+	    // ...
+	    i = i + 1;
+	  }
+	}
+  return 0;
+}
