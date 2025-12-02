@@ -72,6 +72,8 @@ object AstPrinters {
               s"output ${exp.print(printer)};"
             case AErrorStmt(exp, _) =>
               s"error ${exp.print(printer)};"
+            case AAssertStmt(exp, _) =>
+              s"assert ${exp.print(printer)};"
             case AWhileStmt(guard, innerBlock, _) =>
               s"while (${guard.print(printer)}) ${innerBlock.print(printer)}"
             case block: ABlock =>

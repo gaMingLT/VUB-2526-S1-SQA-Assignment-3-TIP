@@ -20,7 +20,7 @@ object FlowSensitiveAnalysis {
 
     val typedCfg = options match {
       case AnalysisOption.`iwlr` | AnalysisOption.`iwlrp` | AnalysisOption.`csiwlrp` | AnalysisOption.`cfiwlrp` | AnalysisOption.`ide` |
-          AnalysisOption.`summary` =>
+          AnalysisOption.`summary` | AnalysisOption.`wlrw` =>
         cfg match {
           case w: InterproceduralProgramCfg => Right(w)
           case _ => throw new RuntimeException(s"Whole CFG needed")
@@ -62,12 +62,11 @@ object FlowSensitiveAnalysis {
         })
       case AnalysisOption.`wlrw` =>
         Some(kind match {
-          case Analysis.interval => new IntervalAnalysis.Intraprocedural.WorklistSolverWithWidening(typedCfg.left.get)
+          case Analysis.interval => new IntervalAnalysis(typedCfg.right.get)
           case _ => throw new RuntimeException(s"Unsupported solver option `$options` for the analysis $kind")
         })
       case AnalysisOption.`wlrwn` =>
         Some(kind match {
-          case Analysis.interval => new IntervalAnalysis.Intraprocedural.WorklistSolverWithWideningAndNarrowing(typedCfg.left.get)
           case _ => throw new RuntimeException(s"Unsupported solver option `$options` for the analysis $kind")
         })
       case AnalysisOption.`wlrp` =>
@@ -90,14 +89,14 @@ object FlowSensitiveAnalysis {
         })
       case AnalysisOption.`csiwlrp` =>
         Some(kind match {
-          case Analysis.sign => new SignAnalysis.Interprocedural.CallString(typedCfg.right.get)
-          case Analysis.constprop => new ConstantPropagationAnalysis.Interprocedural.CallString(typedCfg.right.get)
+          //case Analysis.sign => new SignAnalysis.Interprocedural.CallString(typedCfg.right.get)
+          //case Analysis.constprop => new ConstantPropagationAnalysis.Interprocedural.CallString(typedCfg.right.get)
           case _ => throw new RuntimeException(s"Unsupported solver option `$options` for the analysis $kind")
         })
       case AnalysisOption.`cfiwlrp` =>
         Some(kind match {
-          case Analysis.sign => new SignAnalysis.Interprocedural.Functional(typedCfg.right.get)
-          case Analysis.constprop => new ConstantPropagationAnalysis.Interprocedural.Functional(typedCfg.right.get)
+          //case Analysis.sign => new SignAnalysis.Interprocedural.Functional(typedCfg.right.get)
+          //case Analysis.constprop => new ConstantPropagationAnalysis.Interprocedural.Functional(typedCfg.right.get)
           case _ => throw new RuntimeException(s"Unsupported solver option `$options` for the analysis $kind")
         })
       case AnalysisOption.`ide` =>
@@ -144,6 +143,7 @@ object FlowSensitiveAnalysis {
         case `cfiwlrp` => true
         case `ide` => true
         case `summary` => true
+        case `wlrw` => true
         case _ => false
       }
 

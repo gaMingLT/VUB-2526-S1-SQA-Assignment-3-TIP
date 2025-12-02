@@ -51,12 +51,12 @@ object ConstantPropagationAnalysis {
       * Interprocedural analysis that uses the worklist solver with reachability and propagation-style.
       * with call-string context sensitivity.
       */
-    class CallString(cfg: InterproceduralProgramCfg)(implicit declData: DeclarationData) extends CallStringValueAnalysis(cfg, ConstantPropagationLattice)
+    //class CallString(cfg: InterproceduralProgramCfg)(implicit declData: DeclarationData) extends CallStringValueAnalysis(cfg, ConstantPropagationLattice)
 
     /**
       * Interprocedural analysis that uses the worklist solver with reachability and propagation-style.
       * with functional-approach context sensitivity.
       */
-    class Functional(cfg: InterproceduralProgramCfg)(implicit declData: DeclarationData) extends FunctionalValueAnalysis(cfg, ConstantPropagationLattice)
+    //class Functional(cfg: InterproceduralProgramCfg)(implicit declData: DeclarationData) extends FunctionalValueAnalysis(cfg, ConstantPropagationLattice)
   }
 }

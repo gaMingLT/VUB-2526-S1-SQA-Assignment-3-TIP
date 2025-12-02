@@ -395,3 +395,24 @@ trait WorklistFixpointSolverWithReachabilityAndWideningAndNarrowing[N]
   override def analyze(): lattice.Element =
     narrow(super[WorklistFixpointSolverWithReachabilityAndWidening].analyze(), narrowingSteps)
 }
+
+trait WorklistFixpointPropagationSolverWidening[N]
+    extends WorklistFixpointPropagationSolver[N]
+    with WorklistFixpointSolverWithReachabilityAndWidening[N] {
+
+  override def process(n: N) = {
+    // read the current lattice element
+    val xn = x(n)
+    // apply the transfer function
+    FixpointSolvers.log.verb(s"Processing $n in state $xn")
+    val y = transfer(n, xn)
+    FixpointSolvers.log.verb(s"Resulting state: $y")
+    // propagate to all nodes that depend on this one ADDED: with widening
+    for (m <- outdep(n)) propagate((if (loophead(n)) widen(xn, y) else y), m)
+    //for (m <- outdep(n)) propagate(y, m)
+  }
+
+  // We do not use narrowing, as this would require restating the narrowing function away from the using the simple definition of 'fun' from SimpleMaplatticeFixpointSolver
+  //override def analyze(): lattice.Element =
+  //  narrow(super[WorklistFixpointPropagationSolver].analyze(), narrowingSteps)
+}

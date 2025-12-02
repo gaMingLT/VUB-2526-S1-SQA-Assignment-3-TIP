@@ -247,10 +247,7 @@ object Tip extends App {
                     log.verb(s"Starting ${an.getClass.getSimpleName}")
                     val res = an.analyze()
                     val res2 =
-                      if (dfo.contextsensitive(v))
                         Output.transform(res.asInstanceOf[Map[(CallContext, CfgNode), _]])
-                      else
-                        res.asInstanceOf[Map[CfgNode, _]]
                     Output.output(file, DataFlowOutput(s), wcfg.toDot(Output.labeler(res2, an.stateAfterNode), Output.dotIder), options.out)
                   }
                 }

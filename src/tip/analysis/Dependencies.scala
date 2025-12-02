@@ -99,5 +99,10 @@ trait ContextSensitiveForwardDependencies[C <: CallContext] extends Dependencies
     * (Not implemented as it is not used by any existing analysis.)
     */
   override def indep(n: (C, CfgNode)): Set[(C, CfgNode)] =
-    ???
+    (n._2 match {
+      case _: CfgAfterCallNode => Set()
+      case _ => n._2.pred.toSet
+    }).map {d =>
+      (n._1, d)
+    }
 }

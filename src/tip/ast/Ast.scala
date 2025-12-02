@@ -149,6 +149,8 @@ case class AVarStmt(declIds: List[AIdentifierDeclaration], loc: Loc) extends ASt
 
 case class AWhileStmt(guard: AExpr, innerBlock: AStmtInNestedBlock, loc: Loc) extends AStmtInNestedBlock
 
+case class AAssertStmt(exp: AExpr, loc: Loc) extends AStmtInNestedBlock
+
 //////////////// Program and function ///////////////
 
 case class AProgram(funs: List[AFunDeclaration], loc: Loc) extends AstNode {

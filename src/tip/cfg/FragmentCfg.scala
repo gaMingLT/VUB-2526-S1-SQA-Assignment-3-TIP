@@ -59,6 +59,8 @@ object FragmentCfg {
           nodeBuilder(CfgStmtNode(data = node))
         case _: AReturnStmt =>
           nodeBuilder(CfgStmtNode(data = node))
+        case _: AAssertStmt =>
+          nodeBuilder(CfgStmtNode(data = node))
         case _: AVarStmt =>
           nodeBuilder(CfgStmtNode(data = node))
         case whl: AWhileStmt =>

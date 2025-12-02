@@ -285,7 +285,7 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
     extends FlowSensitiveAnalysis(false)
     with ContextSensitiveForwardDependencies[C]
     with MapLiftLatticeSolver[(C, CfgNode)]
-    with WorklistFixpointPropagationSolver[(C, CfgNode)]
+    with WorklistFixpointPropagationSolverWidening[(C, CfgNode)]
     with InterprocValueAnalysisMisc[(C, CfgNode)]
     with CallContextFunctions[C] {
 

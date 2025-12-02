@@ -46,6 +46,7 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
     val KNULL = "null"
     val KOUTPUT = "output"
     val KERROR = "error"
+    val KASSERT = "assert"
   }
 
   val keywords = Set(
@@ -215,7 +216,7 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
   }
 
   def Statement: Rule1[AStmtInNestedBlock] = rule {
-    Output | Assigment | Block | While | If | Error
+    Output | Assigment | Block | While | If | Error | Assert
   }
 
   def Assigment: Rule1[AStmtInNestedBlock] = rule {
@@ -267,6 +268,10 @@ class TipParser(val input: ParserInput) extends Parser with Comments {
 
   def Error: Rule1[AStmtInNestedBlock] = rule {
     push(cursor) ~ LanguageKeywords.KERROR ~ Expression ~ ";" ~> ((cur: Int, e: AExpr) => AErrorStmt(e, cur))
+  }
+
+  def Assert: Rule1[AStmtInNestedBlock] = rule {
+    push(cursor) ~ LanguageKeywords.KASSERT ~ Expression ~ ";" ~> ((cur: Int, e: AExpr) => AAssertStmt(e, cur))
   }
 
   def FunApp: Rule1[AExpr] = rule {
