@@ -152,6 +152,28 @@ class FragmentCfg(private[cfg] val graphEntries: Set[CfgNode], private[cfg] val 
   }
 
   /**
+    * Returns the dominators for each node in the CFG.
+    * Simple implementation
+    */
+  lazy val dominators: Map[CfgNode, Set[CfgNode]] = {
+    var dom: Map[CfgNode, Set[CfgNode]] = Map().withDefaultValue(nodes)
+    for (entry <- graphEntries) dom = dom + (entry -> Set(entry))
+
+    def dominatorsRec(dom: Map[CfgNode, Set[CfgNode]]): Map[CfgNode, Set[CfgNode]] = {
+      var ndom: Map[CfgNode, Set[CfgNode]] = dom
+      for (node <- (nodes -- graphEntries)) {
+        val n = (node -> (Set(node) union node.pred.foldLeft(nodes)((n, p) => n intersect ndom(p))))
+        ndom = ndom + n
+      }
+      if (ndom == dom)
+        dom
+      else
+        dominatorsRec(ndom)
+    }
+    dominatorsRec(dom)
+  }
+
+  /**
     * Returns a Graphviz dot representation of the CFG.
     * Each node is labeled using the given function labeler.
     */

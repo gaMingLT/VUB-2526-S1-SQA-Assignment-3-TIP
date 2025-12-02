@@ -244,4 +244,15 @@ object IntervalLattice extends LatticeWithOps {
         //TODO: We can be more precise here
         (IntNum(0), IntNum(1))
     }
+
+  /**
+    * Intersection of two intervals
+    */
+  def intersect(a: Element, b: Element): Element =
+    (a, b) match {
+      case ((l1, h1), (l2, h2)) =>
+        val l = max(Set(l1, l2))
+        val h = min(Set(h1, h2))
+        if (l <= h) (l, h) else bottom
+    }
 }

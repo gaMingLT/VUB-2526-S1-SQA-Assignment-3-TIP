@@ -1,6 +1,6 @@
 package tip.analysis
 
-import tip.cfg.{CfgCallNode, CfgFunEntryNode}
+import tip.cfg.{CfgNode, CfgCallNode, CfgFunEntryNode, CfgStmtNode}
 import tip.lattices.Lattice
 
 /**
@@ -35,12 +35,14 @@ trait CallContextFunctions[C <: CallContext] {
     * @return the context for the callee
     */
   def makeCallContext(c: C, n: CfgCallNode, x: statelattice.Element, f: CfgFunEntryNode): C
+
+  def makeLoopContext(c: C, n: CfgNode, x: statelattice.Element): C
 }
 
 /**
   * Call context for call strings.
   */
-case class CallStringContext(cs: List[CfgCallNode]) extends CallContext {
+case class CallStringContext(cs: List[CfgNode]) extends CallContext {
 
   /**
     * Creates string representation using the source locations of the calls in the call string.
@@ -68,6 +70,9 @@ trait CallStringFunctions extends CallContextFunctions[CallStringContext] {
     */
   def makeCallContext(c: CallStringContext, n: CfgCallNode, x: statelattice.Element, f: CfgFunEntryNode): CallStringContext =
     CallStringContext((n :: c.cs).slice(0, maxCallStringLength))
+
+  def makeLoopContext(c: CallStringContext, n: CfgNode, x: statelattice.Element): CallStringContext =
+    ??? // <--- Discussion Point 2: COMPLETE HERE
 }
 
 /**
@@ -94,4 +99,6 @@ trait FunctionalFunctions extends CallContextFunctions[FunctionalContext] {
     */
   def makeCallContext(c: FunctionalContext, n: CfgCallNode, x: statelattice.Element, f: CfgFunEntryNode): FunctionalContext =
     FunctionalContext(x)
+
+  def makeLoopContext(c: FunctionalContext, n: CfgStmtNode, x: statelattice.Element): FunctionalContext = ???
 }

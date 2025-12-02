@@ -16,7 +16,7 @@ object Log {
     val None, Error, Warn, Info, Debug, Verbose = Value
   }
 
-  var defaultLevel = Level.Info
+  var defaultLevel = Level.Verbose
 
   /**
     * Constructs a new logger.

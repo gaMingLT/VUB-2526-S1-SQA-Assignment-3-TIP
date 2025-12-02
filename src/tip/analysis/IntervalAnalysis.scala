@@ -1,21 +1,38 @@
 package tip.analysis
 
 import tip.cfg._
-import tip.ast.AstNodeData.DeclarationData
+import tip.ast.AstNodeData._
+import tip.ast._
 import tip.lattices.IntervalLattice._
 import tip.lattices._
 import tip.solvers._
 
-trait IntervalAnalysisWidening extends ValueAnalysisMisc with Dependencies[CfgNode] {
+class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: DeclarationData) extends CallStringValueAnalysis(cfg, IntervalLattice) {
 
   import tip.cfg.CfgOps._
+  import tip.ast.AstOps._
 
-  val cfg: ProgramCfg
+  override def localTransfer(n: CfgNode, s: statelattice.Element): statelattice.Element = {
+    n match {
+      case r: CfgStmtNode =>
+        r.data match {
+          // Only handle asserts here, everything else can be handled generically by ValueAnalysis
+          case AAssertStmt(expr: AExpr, _) =>
+            expr match {
+              case ABinaryOp(GreatThan, id: AIdentifier, ANumber(i, _), _) =>
+                ??? // <--- COMPLETE HERE
 
-  val valuelattice: IntervalLattice.type
+              case ABinaryOp(GreatThan, ANumber(i, _), id: AIdentifier, _) =>
+                ??? // <--- COMPLETE HERE
 
-  val liftedstatelattice: LiftLattice[statelattice.type]
-
+              case _ => ???
+            }
+          case _ => super[CallStringValueAnalysis].localTransfer(n, s)
+        }
+      case _ => super[CallStringValueAnalysis].localTransfer(n, s)
+    }
+  }
+  
   /**
     * Int values occurring in the program, plus -infinity and +infinity.
     */
@@ -25,7 +42,11 @@ trait IntervalAnalysisWidening extends ValueAnalysisMisc with Dependencies[CfgNo
     } + MInf + PInf
   }
 
-  def loophead(n: CfgNode): Boolean = indep(n).exists(cfg.rank(_) > cfg.rank(n))
+  def loophead(n: (CallStringContext, CfgNode)): Boolean = {
+    n match { // Actually looks at the loop tail, since abstract states are before rather than after node with the propagation solver
+      case (_, m) => !(m.succ intersect cfg.dominators(m)).isEmpty
+    }
+  }
 
   private def minB(b: IntervalLattice.Num) = B.filter(b <= _).min
 
@@ -35,7 +56,7 @@ trait IntervalAnalysisWidening extends ValueAnalysisMisc with Dependencies[CfgNo
     (x, y) match {
       case (IntervalLattice.EmptyInterval, _) => y
       case (_, IntervalLattice.EmptyInterval) => x
-      case ((l1, h1), (l2, h2)) => ??? //<--- Complete here
+      case ((l1, h1), (l2, h2)) => ??? //<--- COMPLETE HERE
     }
 
   def widen(x: liftedstatelattice.Element, y: liftedstatelattice.Element): liftedstatelattice.Element =
@@ -49,27 +70,3 @@ trait IntervalAnalysisWidening extends ValueAnalysisMisc with Dependencies[CfgNo
     }
 }
 
-object IntervalAnalysis {
-
-  object Intraprocedural {
-
-    /**
-      * Interval analysis, using the worklist solver with init and widening.
-      */
-    class WorklistSolverWithWidening(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
-        extends IntraprocValueAnalysisWorklistSolverWithReachability(cfg, IntervalLattice)
-        with WorklistFixpointSolverWithReachabilityAndWidening[CfgNode]
-        with IntervalAnalysisWidening
-
-    /**
-      * Interval analysis, using the worklist solver with init, widening, and narrowing.
-      */
-    class WorklistSolverWithWideningAndNarrowing(cfg: IntraproceduralProgramCfg)(implicit declData: DeclarationData)
-        extends IntraprocValueAnalysisWorklistSolverWithReachability(cfg, IntervalLattice)
-        with WorklistFixpointSolverWithReachabilityAndWideningAndNarrowing[CfgNode]
-        with IntervalAnalysisWidening {
-
-      val narrowingSteps = 5
-    }
-  }
-}

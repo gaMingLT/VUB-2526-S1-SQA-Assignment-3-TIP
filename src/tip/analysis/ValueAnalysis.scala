@@ -69,10 +69,10 @@ trait ValueAnalysisMisc {
       case r: CfgStmtNode =>
         r.data match {
           // var declarations
-          case varr: AVarStmt => ??? //<--- Complete here
+          case varr: AVarStmt => ??? //<--- COMPLETE HERE
 
           // assignments
-          case AAssignStmt(id: AIdentifier, right, _) => ??? //<--- Complete here
+          case AAssignStmt(id: AIdentifier, right, _) => ??? //<--- COMPLETE HERE
 
           // all others: like no-ops
           case _ => s
@@ -366,6 +366,10 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
       // after-call nodes (like no-op here)
       case _: CfgAfterCallNode => s
 
+      //// Discussion Point 2: COMPLETE HERE
+      //case m: CfgStmtNode if ??? =>
+      //  ???
+        
       // all other nodes
       case m => localTransfer(m, s)
     }
@@ -455,7 +459,7 @@ abstract class CallStringValueAnalysis[L <: LatticeWithOps](cfg: Interprocedural
 ) extends ContextSensitiveValueAnalysis[CallStringContext](cfg)
     with CallStringFunctions {
 
-  override val maxCallStringLength = 2; // overriding default from CallStringFunctions
+  override val maxCallStringLength = 1; // overriding default from CallStringFunctions
 }
 
 /**
