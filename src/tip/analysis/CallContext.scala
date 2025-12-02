@@ -71,8 +71,11 @@ trait CallStringFunctions extends CallContextFunctions[CallStringContext] {
   def makeCallContext(c: CallStringContext, n: CfgCallNode, x: statelattice.Element, f: CfgFunEntryNode): CallStringContext =
     CallStringContext((n :: c.cs).slice(0, maxCallStringLength))
 
-  def makeLoopContext(c: CallStringContext, n: CfgNode, x: statelattice.Element): CallStringContext =
+  // MODDED
+  // TODO: Continue here
+  def makeLoopContext(c: CallStringContext, n: CfgNode, x: statelattice.Element): CallStringContext = {
     ??? // <--- Discussion Point 2: COMPLETE HERE
+  }
 }
 
 /**

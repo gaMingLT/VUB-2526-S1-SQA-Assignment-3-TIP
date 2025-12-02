@@ -69,6 +69,8 @@ trait ValueAnalysisMisc {
     n match {
       case r: CfgStmtNode =>
         r.data match {
+
+          // MODDED
           // var declarations
           // ⟨vi⟩= JOIN(vi)
           case varr: AVarStmt => {
@@ -77,6 +79,7 @@ trait ValueAnalysisMisc {
             }
           } //<--- COMPLETE HERE
 
+          // MODDED
           // assignments
           // ⟨vi⟩= ⟨x=E⟩= JOIN(vi)[x ↦ eval(JOIN(vi), E)]
           case AAssignStmt(id: AIdentifier, right, _) => {
@@ -376,8 +379,13 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
       // after-call nodes (like no-op here)
       case _: CfgAfterCallNode => s
 
+      // MODDED
+      // TODO: Continue here
       //// Discussion Point 2: COMPLETE HERE
-      //case m: CfgStmtNode if ??? =>
+      // Thus, to determine the starts and ends of loops you must use the cfg.dominators function.
+      case m: CfgStmtNode if ??? => {
+        ???
+      }
       //  ???
         
       // all other nodes

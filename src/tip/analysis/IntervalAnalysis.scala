@@ -19,6 +19,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
           // Only handle asserts here, everything else can be handled generically by ValueAnalysis
           case AAssertStmt(expr: AExpr, _) =>
             expr match {
+              // MODDED
               case ABinaryOp(GreatThan, id: AIdentifier, ANumber(i, _), _) => {
                 val xDecl = id.declaration
                 // Get the interval for the declaration
@@ -29,6 +30,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
                 s.updated(xDecl, newInterval)
               }// <--- COMPLETE HERE
 
+              // MODDED
               case ABinaryOp(GreatThan, ANumber(i, _), id: AIdentifier, _) => {
                 val xDecl = id.declaration
                 // Get the interval for the declaration
@@ -71,6 +73,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
       case (IntervalLattice.EmptyInterval, _) => y
       case (_, IntervalLattice.EmptyInterval) => x
       case ((l1, h1), (l2, h2)) => {
+        // MODDED
         IntervalLattice.intersect((l1, h1), (l2, IntervalLattice.PInf))
       } //<--- COMPLETE HERE
     }
