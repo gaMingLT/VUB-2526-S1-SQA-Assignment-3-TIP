@@ -6,6 +6,7 @@ import tip.cfg._
 import tip.lattices._
 import tip.solvers._
 import tip.ast.AstNodeData.{AstNodeWithDeclaration, DeclarationData}
+import tip.types.AbsentFieldType.fv.union
 
 import scala.collection.immutable.Set
 
@@ -69,10 +70,19 @@ trait ValueAnalysisMisc {
       case r: CfgStmtNode =>
         r.data match {
           // var declarations
-          case varr: AVarStmt => ??? //<--- COMPLETE HERE
+          // ⟨vi⟩= JOIN(vi)
+          case varr: AVarStmt => {
+            varr.declIds.foldLeft(s) { (state, decl) =>
+              state.updated(decl, valuelattice.top)
+            }
+          } //<--- COMPLETE HERE
 
           // assignments
-          case AAssignStmt(id: AIdentifier, right, _) => ??? //<--- COMPLETE HERE
+          // ⟨vi⟩= ⟨x=E⟩= JOIN(vi)[x ↦ eval(JOIN(vi), E)]
+          case AAssignStmt(id: AIdentifier, right, _) => {
+            val interval = eval(right, s)
+            s.updated(id, interval)
+          } //<--- COMPLETE HERE
 
           // all others: like no-ops
           case _ => s

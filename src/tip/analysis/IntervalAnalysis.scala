@@ -19,11 +19,25 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
           // Only handle asserts here, everything else can be handled generically by ValueAnalysis
           case AAssertStmt(expr: AExpr, _) =>
             expr match {
-              case ABinaryOp(GreatThan, id: AIdentifier, ANumber(i, _), _) =>
-                ??? // <--- COMPLETE HERE
+              case ABinaryOp(GreatThan, id: AIdentifier, ANumber(i, _), _) => {
+                val xDecl = id.declaration
+                // Get the interval for the declaration
+                val old = s(xDecl)
+                // Create the new interval by applying (zero is ignored?)
+                val newInterval = widenInterval(old, (i, 0))
+                // Update with the new interval
+                s.updated(xDecl, newInterval)
+              }// <--- COMPLETE HERE
 
-              case ABinaryOp(GreatThan, ANumber(i, _), id: AIdentifier, _) =>
-                ??? // <--- COMPLETE HERE
+              case ABinaryOp(GreatThan, ANumber(i, _), id: AIdentifier, _) => {
+                val xDecl = id.declaration
+                // Get the interval for the declaration
+                val old = s(xDecl)
+                // Create the new interval by applying (zero is ignored?)
+                val newInterval = widenInterval(old, (IntervalLattice.MInf, i))
+                // Update with the new interval
+                s.updated(xDecl, newInterval)
+              } // <--- COMPLETE HERE
 
               case _ => ???
             }
@@ -56,7 +70,9 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
     (x, y) match {
       case (IntervalLattice.EmptyInterval, _) => y
       case (_, IntervalLattice.EmptyInterval) => x
-      case ((l1, h1), (l2, h2)) => ??? //<--- COMPLETE HERE
+      case ((l1, h1), (l2, h2)) => {
+        IntervalLattice.intersect((l1, h1), (l2, IntervalLattice.PInf))
+      } //<--- COMPLETE HERE
     }
 
   def widen(x: liftedstatelattice.Element, y: liftedstatelattice.Element): liftedstatelattice.Element =
