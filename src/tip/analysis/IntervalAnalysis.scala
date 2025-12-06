@@ -60,7 +60,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
 
   def loophead(n: (CallStringContext, CfgNode)): Boolean = {
     n match { // Actually looks at the loop tail, since abstract states are before rather than after node with the propagation solver
-      case (_, m) => !(m.succ intersect cfg.dominators(m)).isEmpty
+      case (_, m) => (m.succ intersect cfg.dominators(m)).nonEmpty
     }
   }
 

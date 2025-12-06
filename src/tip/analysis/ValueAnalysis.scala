@@ -11,8 +11,8 @@ import tip.types.AbsentFieldType.fv.union
 import scala.collection.immutable.Set
 
 /**
-  * General definitions for value analysis.
-  */
+ * General definitions for value analysis.
+ */
 trait ValueAnalysisMisc {
 
   implicit val declData: DeclarationData
@@ -20,23 +20,23 @@ trait ValueAnalysisMisc {
   val cfg: ProgramCfg
 
   /**
-    * The lattice of abstract values.
-    */
+   * The lattice of abstract values.
+   */
   val valuelattice: LatticeWithOps
 
   /**
-    * Set of declared variables, used by `statelattice`.
-    */
+   * Set of declared variables, used by `statelattice`.
+   */
   val declaredVars: Set[ADeclaration] = cfg.nodes.flatMap(_.declaredVarsAndParams)
 
   /**
-    * The lattice of abstract states.
-    */
+   * The lattice of abstract states.
+   */
   val statelattice: MapLattice[ADeclaration, valuelattice.type] = new MapLattice(valuelattice)
 
   /**
-    * Default implementation of eval.
-    */
+   * Default implementation of eval.
+   */
   def eval(exp: AExpr, env: statelattice.Element)(implicit declData: DeclarationData): valuelattice.Element = {
     import valuelattice._
     exp match {
@@ -60,8 +60,8 @@ trait ValueAnalysisMisc {
   }
 
   /**
-    * Transfer function for state lattice elements.
-    */
+   * Transfer function for state lattice elements.
+   */
   def localTransfer(n: CfgNode, s: statelattice.Element): statelattice.Element = {
     NoPointers.assertContainsNode(n.data)
     NoCalls.assertContainsNode(n.data)
@@ -96,8 +96,8 @@ trait ValueAnalysisMisc {
 }
 
 /**
-  * Common functionality for interprocedural analysis.
-  */
+ * Common functionality for interprocedural analysis.
+ */
 trait InterprocValueAnalysisMisc[N] extends ValueAnalysisMisc {
 
   implicit val declData: DeclarationData
@@ -105,18 +105,18 @@ trait InterprocValueAnalysisMisc[N] extends ValueAnalysisMisc {
   val cfg: InterproceduralProgramCfg
 
   /**
-    * Lifted state lattice, with new bottom element representing "unreachable".
-    */
+   * Lifted state lattice, with new bottom element representing "unreachable".
+   */
   val liftedstatelattice: LiftLattice[statelattice.type]
 
   /**
-    * The analysis lattice.
-    */
+   * The analysis lattice.
+   */
   val lattice: MapLattice[N, liftedstatelattice.type]
 
   /**
-    * Abstract evaluation of function arguments.
-    */
+   * Abstract evaluation of function arguments.
+   */
   def evalArgs(formalParams: Seq[ADeclaration], actualParams: Seq[AExpr], state: statelattice.Element): statelattice.Element =
     formalParams.zip(actualParams).foldLeft(statelattice.bottom) {
       case (acc, (id, exp)) =>
@@ -125,14 +125,14 @@ trait InterprocValueAnalysisMisc[N] extends ValueAnalysisMisc {
 }
 
 /**
-  * Constraint functions for value analysis (including interprocedural).
-  * This version is for the basic worklist algorithm.
-  */
+ * Constraint functions for value analysis (including interprocedural).
+ * This version is for the basic worklist algorithm.
+ */
 trait InterprocValueAnalysisFunctions extends MapLiftLatticeSolver[CfgNode] with InterprocValueAnalysisMisc[CfgNode] {
 
   /**
-    * Overrides `funsub` from [[tip.solvers.MapLatticeSolver]] adding support for function calls and returns.
-    */
+   * Overrides `funsub` from [[tip.solvers.MapLatticeSolver]] adding support for function calls and returns.
+   */
   override def funsub(n: CfgNode, x: lattice.Element): liftedstatelattice.Element = {
     //import cfg._ // gives easy access to the functionality in InterproceduralProgramCfg
     import liftedstatelattice._
@@ -164,17 +164,17 @@ trait InterprocValueAnalysisFunctions extends MapLiftLatticeSolver[CfgNode] with
 }
 
 /**
-  * Constraint functions for value analysis (including interprocedural), propagation style.
-  * This is a variant of [[InterprocValueAnalysisFunctions]] for use with [[tip.solvers.WorklistFixpointPropagationSolver]].
-  */
+ * Constraint functions for value analysis (including interprocedural), propagation style.
+ * This is a variant of [[InterprocValueAnalysisFunctions]] for use with [[tip.solvers.WorklistFixpointPropagationSolver]].
+ */
 trait InterprocValueAnalysisFunctionsWithPropagation
-    extends MapLiftLatticeSolver[CfgNode]
+  extends MapLiftLatticeSolver[CfgNode]
     with WorklistFixpointPropagationFunctions[CfgNode]
     with InterprocValueAnalysisMisc[CfgNode] {
 
   /**
-    * Transfer function for state lattice elements.
-    */
+   * Transfer function for state lattice elements.
+   */
   def transferUnlifted(n: CfgNode, s: statelattice.Element): statelattice.Element = {
     import cfg._
     import liftedstatelattice._
@@ -222,52 +222,52 @@ trait InterprocValueAnalysisFunctionsWithPropagation
 }
 
 /**
-  * Base class for value analysis with simple (non-lifted) lattice.
-  */
+ * Base class for value analysis with simple (non-lifted) lattice.
+ */
 abstract class SimpleValueAnalysis(val cfg: ProgramCfg)(implicit val decl: DeclarationData) extends FlowSensitiveAnalysis(true) with ValueAnalysisMisc {
 
   /**
-    * The analysis lattice.
-    */
+   * The analysis lattice.
+   */
   val lattice: MapLattice[CfgNode, statelattice.type] = new MapLattice(statelattice)
 
   val domain: Set[CfgNode] = cfg.nodes
 
   /**
-    * Transfer function for state lattice elements.
-    * (Same as `localTransfer` for simple value analysis.)
-    */
+   * Transfer function for state lattice elements.
+   * (Same as `localTransfer` for simple value analysis.)
+   */
   def transfer(n: CfgNode, s: statelattice.Element): statelattice.Element = localTransfer(n, s)
 }
 
 /**
-  * Base class for value analysis with lifted lattice, where the extra bottom element represents "unreachable".
-  */
+ * Base class for value analysis with lifted lattice, where the extra bottom element represents "unreachable".
+ */
 abstract class LiftedValueAnalysis[P <: ProgramCfg](val cfg: P, stateAfterNode: Boolean)(implicit val declData: DeclarationData)
-    extends FlowSensitiveAnalysis(stateAfterNode)
+  extends FlowSensitiveAnalysis(stateAfterNode)
     with MapLatticeSolver[CfgNode]
     with ValueAnalysisMisc {
 
   /**
-    * Lifted state lattice, with new bottom element representing "unreachable".
-    */
+   * Lifted state lattice, with new bottom element representing "unreachable".
+   */
   val liftedstatelattice: LiftLattice[statelattice.type] = new LiftLattice(statelattice)
 
   /**
-    * The analysis lattice.
-    */
+   * The analysis lattice.
+   */
   val lattice: MapLattice[CfgNode, liftedstatelattice.type] = new MapLattice(liftedstatelattice)
 
   val domain: Set[CfgNode] = cfg.nodes
 
   /**
-    * The worklist is initialized with all function entry nodes.
-    */
+   * The worklist is initialized with all function entry nodes.
+   */
   val first: Set[CfgNode] = cfg.funEntries.values.toSet[CfgNode]
 
   /**
-    * Overrides `funsub` from [[tip.solvers.MapLatticeSolver]], treating function entry nodes as reachable.
-    */
+   * Overrides `funsub` from [[tip.solvers.MapLatticeSolver]], treating function entry nodes as reachable.
+   */
   override def funsub(n: CfgNode, x: lattice.Element): liftedstatelattice.Element = {
     import liftedstatelattice._
     n match {
@@ -280,22 +280,22 @@ abstract class LiftedValueAnalysis[P <: ProgramCfg](val cfg: P, stateAfterNode: 
 }
 
 /**
-  * Functionality for basic analyses with lifted state lattice.
-  */
+ * Functionality for basic analyses with lifted state lattice.
+ */
 trait LiftedValueAnalysisMisc extends ValueAnalysisMisc {
 
   /**
-    * Transfer function for state lattice elements.
-    * (Same as `localTransfer` for basic analyses with lifted state lattice.)
-    */
+   * Transfer function for state lattice elements.
+   * (Same as `localTransfer` for basic analyses with lifted state lattice.)
+   */
   def transferUnlifted(n: CfgNode, s: statelattice.Element): statelattice.Element = localTransfer(n, s)
 }
 
 /**
-  * Base class for value analysis with context sensitivity and lifted lattice.
-  */
+ * Base class for value analysis with context sensitivity and lifted lattice.
+ */
 abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: InterproceduralProgramCfg)(implicit val declData: DeclarationData)
-    extends FlowSensitiveAnalysis(false)
+  extends FlowSensitiveAnalysis(false)
     with ContextSensitiveForwardDependencies[C]
     with MapLiftLatticeSolver[(C, CfgNode)]
     with WorklistFixpointPropagationSolverWidening[(C, CfgNode)]
@@ -303,34 +303,34 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
     with CallContextFunctions[C] {
 
   /**
-    * Worklist start locations.
-    */
+   * Worklist start locations.
+   */
   val first = Set((initialContext, cfg.funEntries(cfg.program.mainFunction)))
 
   /**
-    * The initial lattice element at the start locations is "reachable".
-    */
+   * The initial lattice element at the start locations is "reachable".
+   */
   override def init = liftedstatelattice.Lift(statelattice.bottom)
 
   /**
-    * Lifted state lattice, with new bottom element representing "unreachable".
-    */
+   * Lifted state lattice, with new bottom element representing "unreachable".
+   */
   val liftedstatelattice = new LiftLattice(statelattice)
 
   /**
-    * The analysis lattice.
-    */
+   * The analysis lattice.
+   */
   val lattice: MapLattice[(C, CfgNode), liftedstatelattice.type] = new MapLattice(liftedstatelattice)
 
   /**
-    * Collect (reverse) call edges, such that we don't have to search through the global lattice element to find the relevant call contexts.
-    */
+   * Collect (reverse) call edges, such that we don't have to search through the global lattice element to find the relevant call contexts.
+   */
   val returnEdges = new collection.mutable.HashMap[(C, CfgFunExitNode), collection.mutable.Set[(C, CfgAfterCallNode)]]
-  with collection.mutable.MultiMap[(C, CfgFunExitNode), (C, CfgAfterCallNode)]
+    with collection.mutable.MultiMap[(C, CfgFunExitNode), (C, CfgAfterCallNode)]
 
   /**
-    * Transfer function for state lattice elements.
-    */
+   * Transfer function for state lattice elements.
+   */
   def transferUnlifted(n: (C, CfgNode), s: statelattice.Element): statelattice.Element = {
     import cfg._
     import liftedstatelattice._
@@ -379,15 +379,22 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
       // after-call nodes (like no-op here)
       case _: CfgAfterCallNode => s
 
-      // MODDED
+      // MOD-DP2
       // TODO: Continue here
       //// Discussion Point 2: COMPLETE HERE
       // Thus, to determine the starts and ends of loops you must use the cfg.dominators function.
-      case m: CfgStmtNode if ??? => {
-        ???
+      case m: CfgStmtNode if loophead(n) => {
+        val node = m.data
+        println("Current Node: " + node.toString)
+        println("Successor Node: " + (m.succ intersect dominators(m)).head.data)
+
+        val loopStart = (m.succ intersect dominators(m)).head
+        val newContext = makeLoopContext(currentContext, loopStart, s)
+        println("Context: " + newContext)
+
+        s
       }
-      //  ???
-        
+
       // all other nodes
       case m => localTransfer(m, s)
     }
@@ -395,95 +402,95 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
 }
 
 /**
-  * Intraprocedural value analysis that uses [[tip.solvers.SimpleFixpointSolver]].
-  */
+ * Intraprocedural value analysis that uses [[tip.solvers.SimpleFixpointSolver]].
+ */
 abstract class IntraprocValueAnalysisSimpleSolver[L <: LatticeWithOps](cfg: IntraproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends SimpleValueAnalysis(cfg)
-    with SimpleMapLatticeFixpointSolver[CfgNode]
-    with ForwardDependencies
+  with SimpleMapLatticeFixpointSolver[CfgNode]
+  with ForwardDependencies
 
 /**
-  * Intraprocedural value analysis that uses [[tip.solvers.SimpleWorklistFixpointSolver]].
-  */
+ * Intraprocedural value analysis that uses [[tip.solvers.SimpleWorklistFixpointSolver]].
+ */
 abstract class IntraprocValueAnalysisWorklistSolver[L <: LatticeWithOps](cfg: IntraproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends SimpleValueAnalysis(cfg)
-    with SimpleWorklistFixpointSolver[CfgNode]
-    with ForwardDependencies
+  with SimpleWorklistFixpointSolver[CfgNode]
+  with ForwardDependencies
 
 /**
-  * Intraprocedural value analysis that uses [[tip.solvers.WorklistFixpointSolverWithReachability]],
-  * with all function entries as start nodes.
-  */
+ * Intraprocedural value analysis that uses [[tip.solvers.WorklistFixpointSolverWithReachability]],
+ * with all function entries as start nodes.
+ */
 abstract class IntraprocValueAnalysisWorklistSolverWithReachability[L <: LatticeWithOps](cfg: IntraproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends LiftedValueAnalysis(cfg, true)
-    with LiftedValueAnalysisMisc
-    with WorklistFixpointSolverWithReachability[CfgNode]
-    with ForwardDependencies
+  with LiftedValueAnalysisMisc
+  with WorklistFixpointSolverWithReachability[CfgNode]
+  with ForwardDependencies
 
 /**
-  * Intraprocedural value analysis that uses [[tip.solvers.WorklistFixpointPropagationSolver]].
-  */
+ * Intraprocedural value analysis that uses [[tip.solvers.WorklistFixpointPropagationSolver]].
+ */
 abstract class IntraprocValueAnalysisWorklistSolverWithReachabilityAndPropagation[L <: LatticeWithOps](cfg: IntraproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends LiftedValueAnalysis(cfg, false)
-    with LiftedValueAnalysisMisc
-    with WorklistFixpointPropagationSolver[CfgNode]
-    with ForwardDependencies
+  with LiftedValueAnalysisMisc
+  with WorklistFixpointPropagationSolver[CfgNode]
+  with ForwardDependencies
 
 /**
-  * Interprocedural value analysis that uses [[tip.solvers.WorklistFixpointSolverWithReachability]],
-  * with the entry of the main function as the only start node.
-  */
+ * Interprocedural value analysis that uses [[tip.solvers.WorklistFixpointSolverWithReachability]],
+ * with the entry of the main function as the only start node.
+ */
 abstract class InterprocValueAnalysisWorklistSolverWithReachability[L <: LatticeWithOps](cfg: InterproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends LiftedValueAnalysis(cfg, true)
-    with LiftedValueAnalysisMisc
-    with InterprocValueAnalysisFunctions
-    with WorklistFixpointSolverWithReachability[CfgNode]
-    with InterproceduralForwardDependencies {
+  with LiftedValueAnalysisMisc
+  with InterprocValueAnalysisFunctions
+  with WorklistFixpointSolverWithReachability[CfgNode]
+  with InterproceduralForwardDependencies {
 
   /**
-    * Initialize worklist with the program entry point.
-    */
+   * Initialize worklist with the program entry point.
+   */
   override val first = Set[CfgNode](cfg.funEntries(cfg.program.mainFunction))
 }
 
 /**
-  * Interprocedural value analysis that uses [[tip.solvers.WorklistFixpointPropagationSolver]].
-  * Note that this class uses [[tip.analysis.ForwardDependencies]] which has no interprocedural outdeps,
-  * and it does not use indeps.
-  */
+ * Interprocedural value analysis that uses [[tip.solvers.WorklistFixpointPropagationSolver]].
+ * Note that this class uses [[tip.analysis.ForwardDependencies]] which has no interprocedural outdeps,
+ * and it does not use indeps.
+ */
 abstract class InterprocValueAnalysisWorklistSolverWithReachabilityAndPropagation[L <: LatticeWithOps](cfg: InterproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends LiftedValueAnalysis(cfg, false)
-    with InterprocValueAnalysisFunctionsWithPropagation
-    with WorklistFixpointPropagationSolver[CfgNode]
-    with ForwardDependencies {
+  with InterprocValueAnalysisFunctionsWithPropagation
+  with WorklistFixpointPropagationSolver[CfgNode]
+  with ForwardDependencies {
 
   /**
-    * Initialize worklist with the program entry point.
-    */
+   * Initialize worklist with the program entry point.
+   */
   override val first = Set[CfgNode](cfg.funEntries(cfg.program.mainFunction))
 }
 
 /**
-  * Context-sensitive value analysis with call-string approach.
-  */
+ * Context-sensitive value analysis with call-string approach.
+ */
 abstract class CallStringValueAnalysis[L <: LatticeWithOps](cfg: InterproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends ContextSensitiveValueAnalysis[CallStringContext](cfg)
-    with CallStringFunctions {
+  with CallStringFunctions {
 
   override val maxCallStringLength = 1; // overriding default from CallStringFunctions
 }
 
 /**
-  * Context-sensitive value analysis with functional approach.
-  */
+ * Context-sensitive value analysis with functional approach.
+ */
 abstract class FunctionalValueAnalysis[L <: LatticeWithOps](cfg: InterproceduralProgramCfg, val valuelattice: L)(
   implicit override val declData: DeclarationData
 ) extends ContextSensitiveValueAnalysis[FunctionalContext](cfg)
-    with FunctionalFunctions
+  with FunctionalFunctions
