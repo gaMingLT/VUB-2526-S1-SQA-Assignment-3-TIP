@@ -391,6 +391,9 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
         val loopStart = (m.succ intersect dominators(m)).head
         val newContext = makeLoopContext(currentContext, loopStart, s)
         println("Context: " + newContext)
+        println("S: " + s)
+
+        propagate(s, (newContext, m))
 
         s
       }
