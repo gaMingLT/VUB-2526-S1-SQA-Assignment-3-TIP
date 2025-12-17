@@ -384,14 +384,14 @@ abstract class ContextSensitiveValueAnalysis[C <: CallContext](val cfg: Interpro
       //// Discussion Point 2: COMPLETE HERE
       // Thus, to determine the starts and ends of loops you must use the cfg.dominators function.
       case m: CfgStmtNode if loophead(n) => {
-        val node = m.data
-        println("Current Node: " + node.toString)
-        println("Successor Node: " + (m.succ intersect dominators(m)).head.data)
+         val node = m.data
+         println("Current Node: " + node.toString)
+         println("Successor Node: " + (m.succ intersect dominators(m)).head.data)
 
         val loopStart = (m.succ intersect dominators(m)).head
         val newContext = makeLoopContext(currentContext, loopStart, s)
-        println("Context: " + newContext)
-        println("S: " + s)
+        // println("Context: " + newContext)
+        // println("S: " + s)
 
         propagate(s, (newContext, m))
 
