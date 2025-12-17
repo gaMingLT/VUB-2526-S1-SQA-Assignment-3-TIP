@@ -72,7 +72,7 @@ trait ValueAnalysisMisc {
 
           // MODDED
           // var declarations
-          // ⟨vi⟩= JOIN(vi)
+          // ⟨vi⟩= ⟨x=E⟩= JOIN(vi)[x ↦ eval(JOIN(vi), E)]
           case varr: AVarStmt => {
             varr.declIds.foldLeft(s) { (state, decl) =>
               state.updated(decl, valuelattice.top)
@@ -81,7 +81,7 @@ trait ValueAnalysisMisc {
 
           // MODDED
           // assignments
-          // ⟨vi⟩= ⟨x=E⟩= JOIN(vi)[x ↦ eval(JOIN(vi), E)]
+          // ⟨vi⟩= JOIN(vi)
           case AAssignStmt(id: AIdentifier, right, _) => {
             val interval = eval(right, s)
             s.updated(id, interval)
