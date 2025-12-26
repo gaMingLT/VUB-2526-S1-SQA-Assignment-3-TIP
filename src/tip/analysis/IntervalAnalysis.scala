@@ -25,7 +25,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
                 val xDecl = id.declaration
                 // Get the interval for the declaration
                 val old = s(xDecl)
-                // Create the new interval by applying (zero is ignored?)
+                // Create the new interval by applying (zero PInf ignored)
                 val newInterval = widenInterval(old, (i, PInf))
                 // Update with the new interval
                 s.updated(xDecl, newInterval)
@@ -36,7 +36,7 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
                 val xDecl = id.declaration
                 // Get the interval for the declaration
                 val old = s(xDecl)
-                // Create the new interval by applying (zero is ignored?)
+                // Create the new interval by applying (zero is MInf is ignored)
                 val newInterval = widenInterval(old, (i, MInf))
                 // Update with the new interval
                 s.updated(xDecl, newInterval)
