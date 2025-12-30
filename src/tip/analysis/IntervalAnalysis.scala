@@ -20,23 +20,23 @@ class IntervalAnalysis(cfg: InterproceduralProgramCfg)(implicit declData: Declar
           case AAssertStmt(expr: AExpr, _) =>
             expr match {
               // MODDED
-              // x >= value
+              // assert value > number
               case ABinaryOp(GreatThan, id: AIdentifier, ANumber(i, _), _) =>
                 val xDecl = id.declaration
                 // Get the interval for the declaration
                 val old = s(xDecl)
-                // Create the new interval by applying (zero PInf ignored)
+                // Create the new interval by applying (PInf is ignored)
                 val newInterval = widenInterval(old, (i, PInf))
                 // Update with the new interval
                 s.updated(xDecl, newInterval)
 
               // MODDED
-              // value >= number
+              // assert number > value
               case ABinaryOp(GreatThan, ANumber(i, _), id: AIdentifier, _) =>
                 val xDecl = id.declaration
                 // Get the interval for the declaration
                 val old = s(xDecl)
-                // Create the new interval by applying (zero is MInf is ignored)
+                // Create the new interval by applying (MInf is ignored)
                 val newInterval = widenInterval(old, (i, MInf))
                 // Update with the new interval
                 s.updated(xDecl, newInterval)
